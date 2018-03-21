@@ -72,11 +72,11 @@ else
 endif
 
 
-if not (config.get('HAVE_SYS_TYPES_H', 0) == 1 and
+if not (config.get('HAVE_SYS_TYPES_H', false) and
         cc.has_header_symbol('sys/types.h', 'off_t'))
   config.set('off_t', 'long')
 endif
-if not (config.get('HAVE_SYS_TYPES_H', 0) == 1 and
+if not (config.get('HAVE_SYS_TYPES_H', false) and
         cc.has_header_symbol('sys/types.h', 'size_t'))
   config.set('size_t', 'unsigned')
 endif
