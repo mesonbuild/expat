@@ -30,7 +30,7 @@ config = configuration_data()
 cc = meson.get_compiler('c')
 
 # Define how much context to retain around the current parse point.
-config.set('XML_CONTEXT_BYTES' 1024)
+config.set('XML_CONTEXT_BYTES', 1024)
 
 if get_option('use_libbsd')
   dep_libbsd = dependency('libbsd')
