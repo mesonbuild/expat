@@ -59,7 +59,7 @@ foreach h : ['dlfcn', 'fcntl', 'inttypes', 'memory', 'stdint', 'stdlib',
   endif
 endforeach
 
-foreach f : ['getpagesize', 'bcopy', 'mmap', 'getrandom']
+foreach f : ['getpagesize', 'memmove', 'bcopy', 'mmap', 'getrandom']
   if cc.has_function(f)
     config.set('HAVE_@0@'.format(f.to_upper()), true)
   endif
