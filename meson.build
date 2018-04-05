@@ -115,24 +115,35 @@ if not ['windows', 'cygwin'].contains(host_machine.system())
   endif
 endif
 
-soversion = host_machine.system() != 'windows' ? '1' : ''
+_files = [
+  files(
+    'lib/loadlibrary.c', 'lib/xmlparse.c', 'lib/xmlrole.c', 'lib/xmltok.c',
+    'lib/xmltok_impl.c', 'lib/xmltok_ns.c',
+  ),
+  config_h,
+]
 
-libexpat = library(
-  'expat',
-  [
-    files(
-      'lib/loadlibrary.c', 'lib/xmlparse.c', 'lib/xmlrole.c', 'lib/xmltok.c',
-      'lib/xmltok_impl.c', 'lib/xmltok_ns.c',
-    ),
-    config_h,
-  ],
-  vs_module_defs : 'lib/libexpat.def',
-  include_directories : include_directories('lib'),
-  dependencies : dep_libbsd,
-  version : '1.6.7',
-  soversion : soversion,
-  install : get_option('default_library') == 'shared',
-)
+if cc.get_id() == 'msvc'
+  libexpat = library(
+    'expat',
+    _files,
+    vs_module_defs : 'lib/libexpat.def',
+    include_directories : include_directories('lib'),
+    dependencies : dep_libbsd,
+    version : '1.6.7',
+    install : get_option('default_library') == 'shared',
+  )
+else
+  libexpat = library(
+    'expat',
+    _files,
+    include_directories : include_directories('lib'),
+    dependencies : dep_libbsd,
+    version : '1.6.7',
+    soversion : host_machine.system() != 'windows' ? '1' : '',
+    install : get_option('default_library') == 'shared',
+  )
+endif
 
 expat_dep = declare_dependency(
   sources : config_h,
