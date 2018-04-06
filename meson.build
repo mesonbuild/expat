@@ -30,7 +30,7 @@ config = configuration_data()
 cc = meson.get_compiler('c')
 
 # Define how much context to retain around the current parse point.
-config.set('XML_CONTEXT_BYTES' 1024)
+config.set('XML_CONTEXT_BYTES', 1024)
 
 if get_option('use_libbsd')
   dep_libbsd = dependency('libbsd')
@@ -72,11 +72,11 @@ else
 endif
 
 
-if not (config.get('HAVE_SYS_TYPES_H', 0) == 1 and
+if not (config.get('HAVE_SYS_TYPES_H', false) and
         cc.has_header_symbol('sys/types.h', 'off_t'))
   config.set('off_t', 'long')
 endif
-if not (config.get('HAVE_SYS_TYPES_H', 0) == 1 and
+if not (config.get('HAVE_SYS_TYPES_H', false) and
         cc.has_header_symbol('sys/types.h', 'size_t'))
   config.set('size_t', 'unsigned')
 endif
