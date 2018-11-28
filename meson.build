@@ -1,4 +1,5 @@
 # Copyright © 2018 Dylan Baker
+# Copyright © 2018 Intel Corporation
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +23,8 @@ project(
   'expat',
   'c',
   license : 'MIT',
-  version : '2.2.5',
-  meson_version : '>= 0.44.0',
+  version : '2.2.6',
+  meson_version : '>= 0.48.0',
 )
 
 config = configuration_data()
@@ -32,11 +33,9 @@ cc = meson.get_compiler('c')
 # Define how much context to retain around the current parse point.
 config.set('XML_CONTEXT_BYTES', 1024)
 
-if get_option('use_libbsd')
-  dep_libbsd = dependency('libbsd')
+dep_libbsd = dependency('libbsd', required : get_option('use_libbsd'))
+if dep_libbsd.found()
   config.set('HAVE_LIBBSD', true)
-else
-  dep_libbsd = []
 endif
 
 if cc.has_function('arc4random_buf')
@@ -149,7 +148,7 @@ libexpat = library(
   vs_module_defs : 'lib/libexpat.def',
   include_directories : include_directories('lib'),
   dependencies : dep_libbsd,
-  version : '1.6.7',
+  version : '1.6.8',
   soversion : host_machine.system() != 'windows' ? '1' : '',
   install : true,
 )
