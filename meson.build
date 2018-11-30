@@ -94,9 +94,29 @@ if cc.compiles('''
   config.set('HAVE_SYSCALL_GETRANDOM', true)
 endif
 
+# Install headers
 config_h = configure_file(
   configuration : config,
   output : 'expat_config.h',
+  install_dir : get_option('includedir'),
+  install : true,
+)
+install_headers('lib/expat.h', 'lib/expat_external.h')
+
+# pkg-config file
+pkgdata = configuration_data()
+pkgdata.set('prefix', get_option('prefix'))
+pkgdata.set('exec_prefix', get_option('prefix'))
+pkgdata.set('libdir', '${prefix}/' + get_option('libdir'))
+pkgdata.set('includedir', '${prefix}/' + get_option('includedir'))
+pkgdata.set('PACKAGE_VERSION', meson.project_version())
+
+configure_file(
+  input : 'expat.pc.in',
+  output : 'expat.pc',
+  configuration : pkgdata,
+  install_dir : join_paths(get_option('libdir'), 'pkgconfig'),
+  install: true
 )
 
 add_project_arguments('-DHAVE_EXPAT_CONFIG_H', language : ['c'])
@@ -123,27 +143,16 @@ _files = [
   config_h,
 ]
 
-if cc.get_id() == 'msvc'
-  libexpat = library(
-    'expat',
-    _files,
-    vs_module_defs : 'lib/libexpat.def',
-    include_directories : include_directories('lib'),
-    dependencies : dep_libbsd,
-    version : '1.6.7',
-    install : get_option('default_library') == 'shared',
-  )
-else
-  libexpat = library(
-    'expat',
-    _files,
-    include_directories : include_directories('lib'),
-    dependencies : dep_libbsd,
-    version : '1.6.7',
-    soversion : host_machine.system() != 'windows' ? '1' : '',
-    install : get_option('default_library') == 'shared',
-  )
-endif
+libexpat = library(
+  'expat',
+  _files,
+  vs_module_defs : 'lib/libexpat.def',
+  include_directories : include_directories('lib'),
+  dependencies : dep_libbsd,
+  version : '1.6.7',
+  soversion : host_machine.system() != 'windows' ? '1' : '',
+  install : true,
+)
 
 expat_dep = declare_dependency(
   sources : config_h,
