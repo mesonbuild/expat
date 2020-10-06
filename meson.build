@@ -135,6 +135,13 @@ configure_file(
   install: true
 )
 
+if get_option('build_tests')
+  visibility = 'default'
+else
+  visibility = 'hidden'
+  add_project_arguments('-DXML_ENABLE_VISIBILITY=1', language : ['c'])
+endif
+
 add_project_arguments('-DHAVE_EXPAT_CONFIG_H', language : ['c'])
 if cc.has_argument('-fno-strict-aliasing')
   add_project_arguments('-fno-strict-aliasing', language : ['c'])
@@ -162,30 +169,22 @@ _files = [
 
 # the lib/libexpat.def file is not valid with mingw, only with mvsc, intel-cl,
 # and clang-cl
+extra_kwargs = {}
 if cc.get_id() != 'gcc'
-  libexpat = library(
-    'expat',
-    _files,
-    vs_module_defs : 'lib/libexpat.def',
-    include_directories : include_directories('lib'),
-    dependencies : dep_libbsd,
-    version : '1.6.11',
-    soversion : host_machine.system() != 'windows' ? '1' : '',
-    install : true,
-    gnu_symbol_visibility : 'hidden',
-  )
-else
-  libexpat = library(
-    'expat',
-    _files,
-    include_directories : include_directories('lib'),
-    dependencies : dep_libbsd,
-    version : '1.6.11',
-    soversion : host_machine.system() != 'windows' ? '1' : '',
-    install : true,
-    gnu_symbol_visibility : get_option('build_tests') ? 'default' : 'hidden',
-  )
+  extra_kwargs += {'vs_module_defs' : 'lib/libexpat.def'}
 endif
+
+libexpat = library(
+  'expat',
+  _files,
+  include_directories : include_directories('lib'),
+  dependencies : dep_libbsd,
+  version : '1.6.11',
+  soversion : host_machine.system() != 'windows' ? '1' : '',
+  install : true,
+  gnu_symbol_visibility : visibility,
+  kwargs : extra_kwargs,
+)
 
 expat_dep = declare_dependency(
   sources : config_h,
