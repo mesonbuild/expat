@@ -119,22 +119,6 @@ config_h = configure_file(
 )
 install_headers('lib/expat.h', 'lib/expat_external.h')
 
-# pkg-config file
-pkgdata = configuration_data()
-pkgdata.set('prefix', get_option('prefix'))
-pkgdata.set('exec_prefix', get_option('prefix'))
-pkgdata.set('libdir', '${prefix}/' + get_option('libdir'))
-pkgdata.set('includedir', '${prefix}/' + get_option('includedir'))
-pkgdata.set('PACKAGE_VERSION', meson.project_version())
-
-configure_file(
-  input : 'expat.pc.in',
-  output : 'expat.pc',
-  configuration : pkgdata,
-  install_dir : join_paths(get_option('libdir'), 'pkgconfig'),
-  install: true
-)
-
 if get_option('build_tests')
   visibility = 'default'
 else
@@ -191,6 +175,9 @@ expat_dep = declare_dependency(
   link_with : libexpat,
   include_directories : include_directories('lib'),
 )
+
+pkg = import('pkgconfig')
+pkg.generate(libexpat)
 
 if get_option('build_tests')
   add_languages('cpp')
