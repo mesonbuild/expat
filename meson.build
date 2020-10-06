@@ -148,7 +148,6 @@ _files = [
     'lib/xmlrole.c',
     'lib/xmltok.c',
   ),
-  config_h,
 ]
 
 # the lib/libexpat.def file is not valid with mingw, only with mvsc, intel-cl,
@@ -171,7 +170,6 @@ libexpat = library(
 )
 
 expat_dep = declare_dependency(
-  sources : config_h,
   link_with : libexpat,
   include_directories : include_directories('lib'),
 )
